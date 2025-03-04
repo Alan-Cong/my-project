@@ -1,20 +1,27 @@
-body {
-    font-family: 'Poppins', sans-serif;
+/* ========== 全局重置 ========== */
+* {
     margin: 0;
     padding: 0;
-    background-color: #0A0A0A;
-    color: #FFFFFF;
+    box-sizing: border-box;
 }
 
-/* Hero Section */
+/* ========== 全局字体与色彩 ========== */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #fafafa; /* 背景偏淡 */
+    color: #333;
+}
+
+/* ========== Hero区域 ========== */
 .hero {
     height: 100vh;
-    background: url('your-background-image.jpg') no-repeat center center/cover;
+    background: #4B2E83; /* 可替换为背景图或任意颜色 */
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
     color: #fff;
+    padding: 0 20px;
 }
 
 .hero-content {
@@ -22,61 +29,82 @@ body {
 }
 
 .hero h1 {
-    font-size: 4rem;
-    margin: 0;
+    font-size: 3rem;
+    margin-bottom: 10px;
     font-weight: 600;
 }
 
 .hero p {
-    font-size: 1.5rem;
-    margin: 10px 0;
+    font-size: 1.2rem;
+    margin: 8px 0;
 }
 
 .hero button {
     padding: 12px 24px;
     font-size: 1rem;
-    background-color: #FF6F61;
+    background-color: #ff6f61;
     border: none;
-    color: #FFF;
+    color: #fff;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 4px;
+    margin-top: 20px;
+    transition: background 0.3s;
 }
 
 .hero button:hover {
-    background-color: #FF5B50;
+    background-color: #ff5b50;
 }
 
-/* Sections */
+/* ========== 通用内容区 ========== */
 .section {
     padding: 60px 20px;
     text-align: center;
 }
 
 .section h2 {
-    font-size: 2.5rem;
+    font-size: 2rem;
+    color: #4B2E83;
     margin-bottom: 20px;
-    color: #FF6F61;
 }
 
-.progress, .results {
+.section p {
+    font-size: 1rem;
+    line-height: 1.8;
+    max-width: 800px;
+    margin: 0 auto;
+    margin-bottom: 15px;
+}
+
+/* ========== 项目进展(Progress) ========== */
+.progress {
     display: flex;
-    justify-content: center;
     flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 30px;
 }
 
-.progress-item, .result-item {
-    width: 30%;
-    margin: 10px;
-    background-color: #1A1A1A;
+.progress-item {
+    background-color: #fff;
+    width: 280px;
+    border-radius: 6px;
     padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    text-align: left;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-.progress-item h3, .result-item h3 {
-    color: #FF6F61;
+.progress-item h3 {
+    font-size: 1.2rem;
+    color: #4B2E83;
+    margin-bottom: 10px;
 }
 
+.progress-item p {
+    font-size: 0.95rem;
+    color: #555;
+}
+
+/* ========== 团队介绍 ========== */
 .team {
     display: flex;
     justify-content: center;
@@ -89,17 +117,83 @@ body {
     height: 150px;
     border-radius: 50%;
     margin-right: 20px;
+    object-fit: cover;
+    border: 3px solid #4B2E83;
 }
 
 .team h3 {
-    margin: 0;
-    color: #FF6F61;
+    margin-bottom: 8px;
+    color: #4B2E83;
 }
 
-/* Footer */
+.team p {
+    text-align: left;
+    max-width: 400px;
+}
+
+/* ========== 成就与影响(Results) ========== */
+.results {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.result-item {
+    background-color: #fff;
+    width: 280px;
+    border-radius: 6px;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    text-align: left;
+}
+
+.result-item h3 {
+    font-size: 1.2rem;
+    color: #4B2E83;
+    margin-bottom: 10px;
+}
+
+.result-item p {
+    font-size: 0.95rem;
+    color: #555;
+}
+
+/* ========== 页脚(Footer) ========== */
 .footer {
     background-color: #1A1A1A;
     padding: 20px;
     text-align: center;
+}
+
+.footer p {
+    margin: 0;
+    color: #fff;
     font-size: 0.9rem;
+}
+
+/* ========== 响应式布局 ========== */
+@media (max-width: 768px) {
+    .hero {
+        height: auto;
+        padding: 40px 20px;
+    }
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .progress, .results {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .team {
+        flex-direction: column;
+    }
+
+    .team img {
+        margin-bottom: 20px;
+        margin-right: 0;
+    }
 }
