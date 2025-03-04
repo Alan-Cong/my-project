@@ -1,199 +1,270 @@
-/* ========== 全局重置 ========== */
+/* ========== 全局样式 ========== */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* ========== 全局字体与色彩 ========== */
 body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #fafafa; /* 背景偏淡 */
-    color: #333;
+  font-family: 'Poppins', sans-serif;
+  background-color: #fafafa;
+  color: #333;
+  line-height: 1.6;
 }
 
-/* ========== Hero区域 ========== */
+/* ========== 导航栏 ========== */
+.navbar {
+  background-color: #4B2E83; /* 南开紫,可自行调整 */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 10%;
+}
+.navbar .logo {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff;
+}
+.navbar .nav-links a {
+  margin-left: 20px;
+  font-weight: 500;
+  color: #fff;
+  text-decoration: none;
+}
+.navbar .nav-links a:hover {
+  opacity: 0.8;
+}
+
+/* ========== 头部(Hero) ========== */
 .hero {
-    height: 100vh;
-    background: #4B2E83; /* 可替换为背景图或任意颜色 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: #fff;
-    padding: 0 20px;
+  height: 100vh;
+  background: #4B2E83; 
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 20px;
 }
-
 .hero-content {
-    max-width: 800px;
+  max-width: 800px;
 }
-
 .hero h1 {
-    font-size: 3rem;
-    margin-bottom: 10px;
-    font-weight: 600;
+  font-size: 3rem;
+  margin-bottom: 10px;
+  font-weight: 600;
 }
-
 .hero p {
-    font-size: 1.2rem;
-    margin: 8px 0;
+  font-size: 1.2rem;
+  margin: 8px 0;
+}
+.hero-btn {
+  margin-top: 20px;
+  padding: 12px 30px;
+  font-size: 1rem;
+  color: #4B2E83;
+  background: #fff;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+.hero-btn:hover {
+  background: #f1f1f1;
 }
 
-.hero button {
-    padding: 12px 24px;
-    font-size: 1rem;
-    background-color: #ff6f61;
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    border-radius: 4px;
-    margin-top: 20px;
-    transition: background 0.3s;
-}
-
-.hero button:hover {
-    background-color: #ff5b50;
-}
-
-/* ========== 通用内容区 ========== */
+/* ========== 公共区(Section) ========== */
 .section {
-    padding: 60px 20px;
-    text-align: center;
+  padding: 60px 20px;
+  text-align: center;
 }
-
 .section h2 {
-    font-size: 2rem;
-    color: #4B2E83;
-    margin-bottom: 20px;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #4B2E83;
 }
-
 .section p {
-    font-size: 1rem;
-    line-height: 1.8;
-    max-width: 800px;
-    margin: 0 auto;
-    margin-bottom: 15px;
+  font-size: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+  color: #555;
+  margin-bottom: 15px;
+  line-height: 1.8;
 }
 
 /* ========== 项目进展(Progress) ========== */
 .progress {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 30px;
-    margin-top: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
 }
-
 .progress-item {
-    background-color: #fff;
-    width: 280px;
-    border-radius: 6px;
-    padding: 20px;
-    text-align: left;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  background: #fff;
+  width: 280px;
+  border-radius: 6px;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-align: left;
 }
-
 .progress-item h3 {
-    font-size: 1.2rem;
-    color: #4B2E83;
-    margin-bottom: 10px;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #4B2E83;
 }
-
 .progress-item p {
-    font-size: 0.95rem;
-    color: #555;
+  font-size: 0.95rem;
+  color: #555;
 }
 
-/* ========== 团队介绍 ========== */
+/* ========== 团队介绍(Team) ========== */
 .team {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
 }
-
 .team img {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    margin-right: 20px;
-    object-fit: cover;
-    border: 3px solid #4B2E83;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  margin-right: 20px;
+  object-fit: cover;
+  border: 3px solid #4B2E83;
 }
-
 .team h3 {
-    margin-bottom: 8px;
-    color: #4B2E83;
+  margin-bottom: 8px;
+  color: #4B2E83;
+}
+.team p {
+  text-align: left;
+  max-width: 400px;
+  color: #555;
 }
 
-.team p {
-    text-align: left;
-    max-width: 400px;
+/* 核心成员补充 */
+.members {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 40px;
+  gap: 30px;
+}
+.member {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 180px;
+  text-align: center;
+}
+.member img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+  border: 3px solid #4B2E83;
+}
+.member h4 {
+  font-size: 1rem;
+  color: #4B2E83;
+  margin-bottom: 5px;
+}
+.member p {
+  font-size: 0.85rem;
+  color: #555;
 }
 
 /* ========== 成就与影响(Results) ========== */
 .results {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 30px;
-    margin-top: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 30px;
+  gap: 20px;
 }
-
 .result-item {
-    background-color: #fff;
-    width: 280px;
-    border-radius: 6px;
-    padding: 20px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    text-align: left;
+  background: #fff;
+  width: 280px;
+  border-radius: 6px;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-align: left;
 }
-
 .result-item h3 {
-    font-size: 1.2rem;
-    color: #4B2E83;
-    margin-bottom: 10px;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #4B2E83;
+}
+.result-item p {
+  font-size: 0.95rem;
+  color: #555;
 }
 
-.result-item p {
-    font-size: 0.95rem;
-    color: #555;
+/* “更多”信息折叠部分 */
+.toggle-btn {
+  margin-top: 20px;
+  padding: 10px 24px;
+  background: #4B2E83;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.toggle-btn:hover {
+  background: #3A2366;
+}
+.more-info {
+  max-width: 800px;
+  margin: 20px auto 0 auto;
+  text-align: left;
+  display: none; /* 默认隐藏 */
+}
+.more-info p {
+  color: #555;
+  margin-bottom: 10px;
+}
+
+/* ========== 联系方式(Section) ========== */
+#contact p {
+  font-size: 1rem;
+  color: #555;
 }
 
 /* ========== 页脚(Footer) ========== */
 .footer {
-    background-color: #1A1A1A;
-    padding: 20px;
-    text-align: center;
+  background-color: #1A1A1A;
+  padding: 20px;
+  text-align: center;
 }
-
 .footer p {
-    margin: 0;
-    color: #fff;
-    font-size: 0.9rem;
+  margin: 0;
+  color: #fff;
+  font-size: 0.9rem;
 }
 
-/* ========== 响应式布局 ========== */
+/* ========== 响应式(Media Query) ========== */
 @media (max-width: 768px) {
-    .hero {
-        height: auto;
-        padding: 40px 20px;
-    }
-    .hero h1 {
-        font-size: 2rem;
-    }
+  .hero {
+    height: auto;
+    padding: 40px 20px;
+  }
+  .hero h1 {
+    font-size: 2rem;
+  }
 
-    .progress, .results {
-        flex-direction: column;
-        align-items: center;
-    }
+  .progress, .results {
+    flex-direction: column;
+    align-items: center;
+  }
 
-    .team {
-        flex-direction: column;
-    }
-
-    .team img {
-        margin-bottom: 20px;
-        margin-right: 0;
-    }
+  .team {
+    flex-direction: column;
+    text-align: center;
+  }
+  .team img {
+    margin-right: 0;
+    margin-bottom: 20px;
+  }
 }
