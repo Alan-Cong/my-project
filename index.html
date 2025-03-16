@@ -121,6 +121,344 @@
     </div>
   </section>
 
+  <!-- ======= 互动小游戏 ======= -->
+<section class="section" id="games">
+  <h2>互动小游戏</h2>
+  <p>我们准备了两个小游戏，欢迎体验：</p>
+
+  <h3>抓土豆小游戏</h3>
+  <div id="potato-game-container">
+    <canvas id="potatoGameCanvas" width="600" height="400"></canvas>
+  </div>
+  <script>
+  <div id="potato-game-container">
+    <canvas id="potatoGameCanvas" width="600" height="400"></canvas>
+</div>
+<script>
+(() => {
+    const canvas = document.getElementById('potatoGameCanvas');
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    const anchorX = width / 2;
+    const anchorY = 0;
+    const baseRopeLength = 20; // 抓钩绳子的初始长度
+    const maxRopeLength = 380; // 抓钩绳子的最大伸长长度
+    const swingRange = 60; // 抓钩摆动的最大角度（左右各60度）
+    let angle = -swingRange; // 抓钩当前角度（初始从最左侧开始摆动）
+    let angleSpeed = 2; // 抓钩摆动速度（度/帧）
+    let ropeLength = baseRopeLength;
+    let ropeState = 'idle'; // 抓钩状态：'idle'摆动中，'extending'伸长，'retracting'收回
+    let score = 0;
+    const potatoRadius = 15;
+    let potatoes = [];
+    let caughtPotato = null;
+    let gameOver = false;
+    let firstPlay = true;
+    const numPotatoes = 5;
+    // 初始化土豆位置
+    function initPotatoes() {
+        potatoes = [];
+        for (let i = 0; i < numPotatoes; i++) {
+            // 随机生成土豆的位置（避开边缘，接近底部土地区域）
+            const px = Math.random() * (width - 2 * potatoRadius) + potatoRadius;
+            const py = Math.random() * (350 - 280) + 280; // 土豆垂直位置在 280~350 之间
+            potatoes.push({ x: px, y: py });
+        }
+    }
+    initPotatoes();
+    // 点击事件控制：点击放下抓钩或在游戏结束后重新开始
+    canvas.addEventListener('click', () => {
+        if (gameOver) {
+            // 若游戏已结束，点击则重置游戏
+            score = 0;
+            firstPlay = false;  // 重玩时不再显示提示
+            gameOver = false;
+            angle = -swingRange;
+            angleSpeed = Math.abs(angleSpeed); // 恢复摆动方向为正向
+            ropeLength = baseRopeLength;
+            ropeState = 'idle';
+            caughtPotato = null;
+            initPotatoes();
+            return;
+        }
+        if (ropeState !== 'idle') {
+            return; // 抓钩未闲置（尚在伸缩），则忽略点击
+        }
+        // 开始伸出抓钩
+        ropeState = 'extending';
+        if (firstPlay) {
+            firstPlay = false;
+        }
+    });
+    // 游戏帧循环
+    function update() {
+        if (!gameOver) {
+            if (ropeState === 'idle') {
+                // 抓钩左右摆动
+                angle += angleSpeed;
+                if (angle > swingRange || angle < -swingRange) {
+                    // 摆动到边界后折返
+                    angleSpeed = -angleSpeed;
+                    angle = angle > swingRange ? swingRange : -swingRange;
+                }
+            } else if (ropeState === 'extending') {
+                // 抓钩向前伸长
+                ropeLength += 4;
+                const angleRad = angle * Math.PI / 180;
+                const tipX = anchorX + Math.sin(angleRad) * ropeLength;
+                const tipY = anchorY + Math.cos(angleRad) * ropeLength;
+                // 检测是否抓到土豆
+                for (let i = 0; i < potatoes.length; i++) {
+                    const dx = tipX - potatoes[i].x;
+                    const dy = tipY - potatoes[i].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist <= potatoRadius) {
+                        // 抓到土豆
+                        caughtPotato = potatoes[i];
+                        potatoes.splice(i, 1); // 从列表中移除被抓到的土豆
+                        ropeState = 'retracting'; // 开始收回
+                        break;
+                    }
+                }
+                if (ropeLength >= maxRopeLength) {
+                    // 抓钩达到最长，未抓到则开始收回
+                    ropeState = 'retracting';
+                }
+            } else if (ropeState === 'retracting') {
+                // 抓钩收回（携带土豆则慢速，否则快速）
+                ropeLength -= caughtPotato ? 2 : 4;
+                if (ropeLength <= baseRopeLength) {
+                    // 抓钩收回到顶点
+                    ropeLength = baseRopeLength;
+                    ropeState = 'idle';
+                    if (caughtPotato) {
+                        // 将土豆拉上来，计分
+                        score += 100;
+                        caughtPotato = null;
+                        // 若所有土豆都抓完，则游戏结束
+                        if (potatoes.length === 0) {
+                            gameOver = true;
+                        }
+                    }
+                } else if (caughtPotato) {
+                    // 收回过程中更新被抓住土豆的位置（跟随抓钩移动）
+                    const angleRad = angle * Math.PI / 180;
+                    caughtPotato.x = anchorX + Math.sin(angleRad) * ropeLength;
+                    caughtPotato.y = anchorY + Math.cos(angleRad) * ropeLength;
+                }
+            }
+        }
+    }
+    function draw() {
+        ctx.clearRect(0, 0, width, height);
+        // 绘制背景（天空和土地）
+        ctx.fillStyle = '#87CEEB';
+        ctx.fillRect(0, 0, width, 350);    // 天空区域
+        ctx.fillStyle = '#8B4513';
+        ctx.fillRect(0, 350, width, 50);   // 地面区域
+        // 绘制土豆
+        ctx.fillStyle = '#B8860B';
+        for (const p of potatoes) {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, potatoRadius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        // 若有被抓住的土豆，绘制它随抓钩移动
+        if (caughtPotato) {
+            ctx.beginPath();
+            ctx.arc(caughtPotato.x, caughtPotato.y, potatoRadius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        // 绘制抓钩的绳子和钩子
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(anchorX, anchorY);
+        const angleRad = angle * Math.PI / 180;
+        const tipX = anchorX + Math.sin(angleRad) * ropeLength;
+        const tipY = anchorY + Math.cos(angleRad) * ropeLength;
+        ctx.lineTo(tipX, tipY);
+        ctx.stroke();
+        // 抓钩末端的小钩子（画一个小圆点表示）
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.arc(tipX, tipY, 5, 0, Math.PI * 2);
+        ctx.fill();
+        // 绘制得分
+        ctx.fillStyle = '#000000';
+        ctx.font = '16px sans-serif';
+        ctx.fillText(`得分: ${score}`, 10, 20);
+        // 绘制提示文字
+        if (firstPlay) {
+            ctx.font = '18px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('点击画面放下抓钩来抓土豆', width / 2, height / 2);
+            ctx.textAlign = 'start';
+        }
+        if (gameOver) {
+            ctx.font = '18px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('所有土豆都抓到了！点击重新开始。', width / 2, height / 2);
+            ctx.textAlign = 'start';
+        }
+    }
+    function gameLoop() {
+        update();
+        draw();
+        requestAnimationFrame(gameLoop);
+    }
+    gameLoop();
+})();
+</script>
+
+  <h3>除草小游戏</h3>
+  <div id="weed-game-container">
+    <canvas id="weedGameCanvas" width="600" height="400"></canvas>
+  </div>
+  <script>
+<div id="weed-game-container">
+    <canvas id="weedGameCanvas" width="600" height="400"></canvas>
+</div>
+<script>
+(() => {
+    const canvas = document.getElementById('weedGameCanvas');
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    const groundY = 100; // 地平线位置，100px 以下为地面
+    const initialWeeds = 10;
+    let weeds = [];
+    let totalWeeds = initialWeeds;
+    let clearedCount = 0;
+    let gameOver = false;
+    let firstPlay = true;
+    let dragging = false;
+    // 初始化杂草位置
+    function initWeeds() {
+        weeds = [];
+        for (let i = 0; i < initialWeeds; i++) {
+            const margin = 20;
+            const wx = Math.random() * (width - 2 * margin) + margin;
+            const wy = Math.random() * ((height - margin) - (groundY + margin)) + (groundY + margin);
+            const wr = Math.random() * 10 + 10; // 半径在10~20之间随机
+            weeds.push({ x: wx, y: wy, r: wr });
+        }
+        totalWeeds = weeds.length;
+        clearedCount = 0;
+        gameOver = false;
+        // 注意：firstPlay 在重玩时不重置（避免重复显示提示）
+    }
+    // 初始生成杂草
+    initWeeds();
+    // 绘制当前游戏状态
+    function drawGame() {
+        ctx.clearRect(0, 0, width, height);
+        // 背景（天空和地面）
+        ctx.fillStyle = '#87CEEB';
+        ctx.fillRect(0, 0, width, groundY);                  // 天空
+        ctx.fillStyle = '#8B4513';
+        ctx.fillRect(0, groundY, width, height - groundY);   // 地面
+        // 绘制所有杂草
+        ctx.fillStyle = '#228B22';
+        for (const w of weeds) {
+            ctx.beginPath();
+            ctx.arc(w.x, w.y, w.r, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        // 绘制已清除数量/总数
+        ctx.fillStyle = '#000000';
+        ctx.font = '16px sans-serif';
+        ctx.textAlign = 'start';
+        ctx.fillText(`已清除 ${clearedCount}/${totalWeeds}`, 10, 20);
+        // 初次游戏提示
+        if (firstPlay && !gameOver) {
+            ctx.font = '18px sans-serif';
+            ctx.fillText('点击杂草将其清除', 10, 40);
+        }
+        // 游戏结束提示
+        if (gameOver) {
+            ctx.font = '18px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillText('杂草已全部清除！点击重新开始。', width / 2, height / 2);
+            ctx.textAlign = 'start';
+        }
+    }
+    // 初始绘制
+    drawGame();
+    // 事件处理：鼠标按下、移动、松开
+    canvas.addEventListener('mousedown', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        if (gameOver) {
+            // 若游戏已结束，点击重新开始
+            initWeeds();
+            drawGame();
+            return;
+        }
+        // 检查是否点中了杂草
+        let removed = false;
+        for (let i = 0; i < weeds.length; i++) {
+            const w = weeds[i];
+            const dx = mouseX - w.x;
+            const dy = mouseY - w.y;
+            if (dx * dx + dy * dy <= w.r * w.r) {
+                // 点中该杂草，移除
+                weeds.splice(i, 1);
+                clearedCount++;
+                removed = true;
+                if (firstPlay) {
+                    firstPlay = false;
+                }
+                if (weeds.length === 0) {
+                    gameOver = true;
+                }
+                break;
+            }
+        }
+        // 开始拖动模式
+        dragging = true;
+        if (removed) {
+            drawGame();
+        }
+    });
+    canvas.addEventListener('mousemove', (e) => {
+        if (!dragging || gameOver) return;
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        let removed = false;
+        for (let i = 0; i < weeds.length; i++) {
+            const w = weeds[i];
+            const dx = mouseX - w.x;
+            const dy = mouseY - w.y;
+            if (dx * dx + dy * dy <= w.r * w.r) {
+                weeds.splice(i, 1);
+                clearedCount++;
+                removed = true;
+                if (firstPlay) {
+                    firstPlay = false;
+                }
+                if (weeds.length === 0) {
+                    gameOver = true;
+                }
+                break;
+            }
+        }
+        if (removed) {
+            drawGame();
+        }
+    });
+    canvas.addEventListener('mouseup', () => {
+        dragging = false;
+        // 鼠标松开，如游戏结束则等待下次点击触发重新开始
+    });
+})();
+</script>
+</section>
+
   <!-- ======= 联系方式 ======= -->
   <section class="section" id="contact">
     <h2>联系我们</h2>
