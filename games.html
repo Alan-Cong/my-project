@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>小游戏 - 刘帅</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- 引入相同字体和CSS -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* 内联样式简单调整 */
+    body { margin: 0; padding: 0; }
+    .navbar { position: relative; }
+    .back-link {
+      position: absolute;
+      left: 20px;
+      top: 10px;
+      background: #f0f0f0;
+      padding: 5px 10px;
+      border-radius: 4px;
+      text-decoration: none;
+      color: #333;
+    }
+    .section { padding: 20px; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="back-link">返回主页</a>
+    <div class="logo" style="text-align: center;">小游戏</div>
+  </nav>
+  
+  <!-- ======= 抓土豆小游戏 ======= -->
+  <section class="section" id="potato-game">
+    <h2>抓土豆小游戏</h2>
+    <div id="potato-game-container">
+      <canvas id="potatoGameCanvas" width="600" height="400"></canvas>
+    </div>
+    <script>
+    (() => {
+      const canvas = document.getElementById('potatoGameCanvas');
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width;
+      const height = canvas.height;
+      const anchorX = width / 2;
+      const anchorY = 0;
+      const baseRopeLength = 20;
+      const maxRopeLength = 380;
+      const swingRange = 60;
+      let angle = -swingRange;
+      let angleSpeed = 2;
+      let ropeLength = baseRopeLength;
+      let ropeState = 'idle';
+      let score = 0;
+      const potatoRadius = 15;
+      let potatoes = [];
+      let caughtPotato = null;
+      let gameOver = false;
+      let firstPlay = true;
+      const numPotatoes = 5;
+      
+      function initPotatoes() {
+          potatoes = [];
+          for (let i = 0; i < numPotatoes; i++) {
+              const px = Math.random() * (width - 2 * potatoRadius) + potatoRadius;
+              const py = Math.random() * (350 - 280) + 280;
+              potatoes.push({ x: px, y: py });
+          }
+      }
+      initPotatoes();
+      
+      canvas.addEventListener('click', () => {
+          if (gameOver) {
+              score = 0;
+              firstPlay = false;
+              gameOver = false;
+              angle = -swingRange;
+              angleSpeed = Math.abs(angleSpeed);
+              ropeLength = baseRopeLength;
+              ropeState = 'idle';
+              caughtPotato = null;
+              initPotatoes();
+              return;
+          }
+          if (ropeState !== 'idle') return;
+          ropeState = 'extending';
+          if (firstPlay) firstPlay = false;
+      });
+      
+      function update() {
+          if (!gameOver) {
+              if (ropeState === 'idle') {
+                  angle += angleSpeed;
+                  if (angle > swingRange || angle < -swingRange) {
+                      angleSpeed = -angleSpeed;
+                      angle = angle > swingRange ? swingRange : -swingRange;
+                  }
+              } else if (ropeState === 'extending') {
+                  ropeLength += 4;
+                  const angleRad = angle * Math.PI / 180;
+                  const tipX = anchorX + Math.sin(angleRad) * ropeLength;
+                  const tipY = anchorY + Math.cos(angleRad) * ropeLength;
+                  for (let i = 0; i < potatoes.length; i++) {
+                      const dx = tipX - potatoes[i].x;
+                      const dy = tipY - potatoes[i].y;
+                      const dist = Math.sqrt(dx * dx + dy * dy);
+                      if (dist <= potatoRadius) {
+                          caughtPotato = potatoes[i];
+                          potatoes.splice(i, 1);
+                          ropeState = 'retracting';
+                          break;
+                      }
+                  }
+                  if (ropeLength >= maxRopeLength) {
+                      ropeState = 'retracting';
+                  }
+              } else if (ropeState === 'retracting') {
+                  ropeLength -= caughtPotato ? 2 : 4;
+                  if (ropeLength <= baseRopeLength) {
+                      ropeLength = baseRopeLength;
+                      ropeState = 'idle';
+                      if (caughtPotato) {
+                          score += 100;
+                          caughtPotato = null;
+                          if (potatoes.length === 0) {
+                              gameOver = true;
+                          }
+                      }
+                  } else if (caughtPotato) {
+                      const angleRad = angle * Math.PI / 180;
+                      caughtPotato.x = anchorX + Math.sin(angleRad) * ropeLength;
+                      caughtPotato.y = anchorY + Math.cos(angleRad) * ropeLength;
+                  }
+              }
+          }
+      }
+      
+      function draw() {
+          ctx.clearRect(0, 0, width, height);
+          ctx.fillStyle = '#87CEEB';
+          ctx.fillRect(0, 0, width, 350);
+          ctx.fillStyle = '#8B4513';
+          ctx.fillRect(0, 350, width, 50);
+          ctx.fillStyle = '#B8860B';
+          for (const p of potatoes) {
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, potatoRadius, 0, Math.PI * 2);
+              ctx.fill();
+          }
+          if (caughtPotato) {
+              ctx.beginPath();
+              ctx.arc(caughtPotato.x, caughtPotato.y, potatoRadius, 0, Math.PI * 2);
+              ctx.fill();
+          }
+          ctx.strokeStyle = '#000';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(anchorX, anchorY);
+          const angleRad = angle * Math.PI / 180;
+          const tipX = anchorX + Math.sin(angleRad) * ropeLength;
+          const tipY = anchorY + Math.cos(angleRad) * ropeLength;
+          ctx.lineTo(tipX, tipY);
+          ctx.stroke();
+          ctx.fillStyle = '#000';
+          ctx.beginPath();
+          ctx.arc(tipX, tipY, 5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#000';
+          ctx.font = '16px sans-serif';
+          ctx.textAlign = 'start';
+          ctx.fillText(`得分: ${score}`, 10, 20);
+          if (firstPlay) {
+              ctx.font = '18px sans-serif';
+              ctx.textAlign = 'center';
+              ctx.fillText('点击画面放下抓钩来抓土豆', width / 2, height / 2);
+          }
+          if (gameOver) {
+              ctx.font = '18px sans-serif';
+              ctx.textAlign = 'center';
+              ctx.fillText('所有土豆都抓到了！点击重新开始。', width / 2, height / 2);
+          }
+      }
+      
+      function gameLoop() {
+          update();
+          draw();
+          requestAnimationFrame(gameLoop);
+      }
+      gameLoop();
+    })();
+    </script>
+  </section>
+  
+  <!-- ======= 除草小游戏 ======= -->
+  <section class="section" id="weed-game">
+    <h2>除草小游戏</h2>
+    <div id="weed-game-container">
+      <canvas id="weedGameCanvas" width="600" height="400"></canvas>
+    </div>
+    <script>
+    (() => {
+      const canvas = document.getElementById('weedGameCanvas');
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width;
+      const height = canvas.height;
+      const groundY = 100;
+      const initialWeeds = 10;
+      let weeds = [];
+      let totalWeeds = initialWeeds;
+      let clearedCount = 0;
+      let gameOver = false;
+      let firstPlay = true;
+      let dragging = false;
+      
+      function initWeeds() {
+          weeds = [];
+          for (let i = 0; i < initialWeeds; i++) {
+              const margin = 20;
+              const wx = Math.random() * (width - 2 * margin) + margin;
+              const wy = Math.random() * ((height - margin) - (groundY + margin)) + (groundY + margin);
+              const wr = Math.random() * 10 + 10;
+              weeds.push({ x: wx, y: wy, r: wr });
+          }
+          totalWeeds = weeds.length;
+          clearedCount = 0;
+          gameOver = false;
+      }
+      initWeeds();
+      
+      function drawGame() {
+          ctx.clearRect(0, 0, width, height);
+          ctx.fillStyle = '#87CEEB';
+          ctx.fillRect(0, 0, width, groundY);
+          ctx.fillStyle = '#8B4513';
+          ctx.fillRect(0, groundY, width, height - groundY);
+          ctx.fillStyle = '#228B22';
+          for (const w of weeds) {
+              ctx.beginPath();
+              ctx.arc(w.x, w.y, w.r, 0, Math.PI * 2);
+              ctx.fill();
+          }
+          ctx.fillStyle = '#000';
+          ctx.font = '16px sans-serif';
+          ctx.textAlign = 'start';
+          ctx.fillText(`已清除 ${clearedCount}/${totalWeeds}`, 10, 20);
+          if (firstPlay && !gameOver) {
+              ctx.font = '18px sans-serif';
+              ctx.fillText('点击杂草将其清除', 10, 40);
+          }
+          if (gameOver) {
+              ctx.font = '18px sans-serif';
+              ctx.textAlign = 'center';
+              ctx.fillStyle = '#FFF';
+              ctx.fillText('杂草已全部清除！点击重新开始。', width / 2, height / 2);
+          }
+      }
+      drawGame();
+      
+      canvas.addEventListener('mousedown', (e) => {
+          const rect = canvas.getBoundingClientRect();
+          const mouseX = e.clientX - rect.left;
+          const mouseY = e.clientY - rect.top;
+          if (gameOver) {
+              initWeeds();
+              drawGame();
+              return;
+          }
+          let removed = false;
+          for (let i = 0; i < weeds.length; i++) {
+              const w = weeds[i];
+              const dx = mouseX - w.x;
+              const dy = mouseY - w.y;
+              if (dx * dx + dy * dy <= w.r * w.r) {
+                  weeds.splice(i, 1);
+                  clearedCount++;
+                  removed = true;
+                  if (firstPlay) firstPlay = false;
+                  if (weeds.length === 0) {
+                      gameOver = true;
+                  }
+                  break;
+              }
+          }
+          dragging = true;
+          if (removed) {
+              drawGame();
+          }
+      });
+      
+      canvas.addEventListener('mousemove', (e) => {
+          if (!dragging || gameOver) return;
+          const rect = canvas.getBoundingClientRect();
+          const mouseX = e.clientX - rect.left;
+          const mouseY = e.clientY - rect.top;
+          let removed = false;
+          for (let i = 0; i < weeds.length; i++) {
+              const w = weeds[i];
+              const dx = mouseX - w.x;
+              const dy = mouseY - w.y;
+              if (dx * dx + dy * dy <= w.r * w.r) {
+                  weeds.splice(i, 1);
+                  clearedCount++;
+                  removed = true;
+                  if (firstPlay) firstPlay = false;
+                  if (weeds.length === 0) {
+                      gameOver = true;
+                  }
+                  break;
+              }
+          }
+          if (removed) {
+              drawGame();
+          }
+      });
+      
+      canvas.addEventListener('mouseup', () => {
+          dragging = false;
+      });
+    })();
+    </script>
+  </section>
+
+  <footer class="footer">
+    <p>&copy; 2023 遥乡呼影文化传媒有限公司. All Rights Reserved.</p>
+  </footer>
+</body>
+</html>
