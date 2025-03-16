@@ -143,7 +143,7 @@
       const maxRopeLength = 380; // 抓钩绳子的最大伸长长度
       const swingRange = 60; // 抓钩摆动的最大角度（左右各60度）
       let angle = -swingRange; // 抓钩当前角度（初始从最左侧开始摆动）
-      let angleSpeed = 2; // 抓钩摆动速度（度/帧）
+      let angleSpeed = 0.5; // 抓钩摆动速度（度/帧）
       let ropeLength = baseRopeLength;
       let ropeState = 'idle'; // 'idle'：摆动中  'extending'：伸长  'retracting'：收回
       let score = 0;
